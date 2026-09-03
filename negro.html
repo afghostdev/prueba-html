@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Misión: Fabricaciones HiOffice</title>
+  <style>
+    /* VARIABLES Y PALETA DE COLOR ROJO ACCENT */
+    :root {
+      --primary-red: #dc2626;
+      --primary-red-hover: #b91c1c;
+      --primary-red-light: #fef2f2;
+      
+      --hipos-dark: #0f172a;
+      --hipos-header: #1e293b;
+      
+      --bg-base: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* FIX COMPATIBILIDAD iOS/WEBKIT */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent; 
+      -webkit-touch-callout: none;
+    }
+    
+    body { 
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background-color: var(--bg-base); 
+      color: var(--text-main); 
+      display: flex; 
+      flex-direction: column; 
+      height: 100vh; 
+      overflow: hidden; 
+    }
+
+    /* JERARQUÍA TIPOGRÁFICA Y RESALTADOS */
+    h1, h2, h3, h4, h5, .title-red { color: var(--primary-red); font-weight: 800; margin-bottom: 8px; }
+    p { line-height: 1.6; margin-bottom: 12px; color: var(--text-main); }
+    .text-hl { color: var(--primary-red); font-weight: 700; }
+
+    /* LAYOUT GENERAL */
+    .app-header { background: var(--bg-card); border-bottom: 2px solid var(--border); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10; flex-shrink: 0; }
+    .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+    .sidebar { width: 70px; background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 16px; gap: 16px; flex-shrink: 0; z-index: 5; }
+    .viewport { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; position: relative; -webkit-overflow-scrolling: touch; }
+    .content-container { max-width: 900px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; padding-bottom: 120px; }
+
+    /* HEADER COMPONENTS */
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { background: var(--primary-red); color: white; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 800; font-size: 14px; }
+    
+    .progress-wrapper { flex: 1; max-width: 320px; margin: 0 20px; display: flex; flex-direction: column; gap: 6px; }
+    .progress-text { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--primary-red); letter-spacing: 0.5px; }
+    .progress-track { background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; }
+    .progress-fill { background: var(--primary-red); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .score-badge { background: var(--warning-light); color: #92400e; border: 1px solid #fde68a; padding: 6px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 800; }
+    .btn-icon { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 16px; -webkit-appearance: none; }
+    .btn-icon:hover { background: var(--bg-base); border-color: var(--primary-red); }
+
+    /* SIDEBAR NAV */
+    .nav-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--text-muted); background: var(--bg-base); border: 1px solid transparent; transition: 0.2s; cursor: pointer; }
+    .nav-icon.active { background: var(--primary-red); color: white; border-color: var(--primary-red); box-shadow: var(--shadow-sm); }
+    .nav-icon.locked { opacity: 0.4; cursor: not-allowed; }
+
+    /* MOCKUP UI DE HIOFFICE & HIOPOS */
+    .hioffice-mock-header { background: #f1f5f9; border: 1px solid var(--border); border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0; padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; }
+    .mock-tab { padding: 6px 16px; font-size: 12px; font-weight: 700; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px 6px 0 0; cursor: default; }
+    .mock-tab.active { background: var(--primary-red); color: white; border-color: var(--primary-red); }
+
+    .hipos-screen-container { background: var(--hipos-dark); border-radius: var(--radius-md); border: 2px solid #334155; padding: 16px; color: white; margin-bottom: 20px; box-shadow: var(--shadow-md); }
+    .hipos-header-bar { background: var(--hipos-header); padding: 10px 14px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; margin-bottom: 14px; border-bottom: 2px solid var(--primary-red); }
+
+    /* PANELS & CARDS */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); animation: fadeIn 0.3s ease; }
+    .card.with-tabs { border-top-left-radius: 0; }
+    .card-header { font-size: 16px; color: var(--primary-red); font-weight: 800; border-bottom: 2px solid var(--bg-base); padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    
+    .situation-card { background: var(--primary-red-light); border-left: 5px solid var(--primary-red); padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 20px; display: flex; gap: 14px; }
+    .situation-icon { font-size: 26px; }
+    .situation-content h4 { color: var(--primary-red); font-size: 14px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .situation-content p { color: var(--text-main); font-size: 14px; margin: 0; }
+
+    /* FORMULARIOS Y BOTONES DE TOUCH MEJORADO */
+    .grid-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .option-btn { background: var(--bg-base); border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; color: var(--text-main); text-align: left; width: 100%; min-height: 48px; -webkit-appearance: none; }
+    .option-btn:hover { border-color: var(--primary-red); background: var(--primary-red-light); }
+    .option-btn.selected { background: var(--primary-red); color: white; border-color: var(--primary-red); }
+    .option-btn input[type="checkbox"], .option-btn input[type="radio"] { width: 20px; height: 20px; accent-color: var(--primary-red); cursor: pointer; }
+    
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .form-control { padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg-card); color: var(--text-main); outline: none; transition: 0.2s; min-height: 48px; -webkit-appearance: none; }
+    .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 0 3px var(--primary-red-light); }
+
+    .btn-container { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; z-index: 2; position: relative; }
+    .btn { padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; -webkit-appearance: none; }
+    .btn-primary { background: var(--primary-red); color: white; box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-red-hover); transform: translateY(-1px); }
+    .btn-secondary { background: var(--bg-base); color: var(--text-main); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-hint { background: var(--warning-light); color: #92400e; border: 1px solid #fde68a; }
+    .btn-hint:hover { background: #fde68a; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+
+    /* ESTADOS Y TABLAS */
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .status-draft { background: var(--bg-base); color: var(--text-muted); border: 1px solid var(--border); }
+    .status-process { background: var(--warning-light); color: #92400e; border: 1px solid #fde68a; }
+    .status-done { background: var(--success-light); color: #065f46; border: 1px solid #6ee7b7; animation: finishGlow 1.2s ease-in-out infinite alternate; }
+
+    @keyframes finishGlow {
+      from { box-shadow: 0 0 0px var(--success); }
+      to { box-shadow: 0 0 12px var(--success); }
+    }
+    
+    .stock-panel { display: flex; align-items: center; justify-content: space-between; background: var(--bg-base); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 20px; border: 1px solid var(--border); }
+    .stock-flow { display: flex; align-items: center; gap: 16px; font-weight: 600; font-size: 14px; flex-wrap: wrap; }
+    .stock-box { padding: 6px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .stock-box.highlight { background: var(--success-light); color: #065f46; border-color: #6ee7b7; font-weight: 800; animation: popScale 0.4s ease; }
+
+    @keyframes popScale {
+      0% { transform: scale(0.9); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .data-list { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .data-item { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .data-item:last-child { border-bottom: none; }
+    .data-header { background: var(--bg-base); font-weight: 700; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
+
+    /* ADAPTACIÓN MÓVIL PREVISIÓN DE STOCK */
+    @media (max-width: 600px) {
+      .table-responsive-mobile .data-header { display: none; }
+      .table-responsive-mobile .data-item {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px;
+        background: var(--bg-card);
+      }
+      .table-responsive-mobile .data-cell-mobile::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--text-muted);
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+    }
+
+    /* HIOBOT ASISTENTE PERSONALIZADO */
+    .bot-widget { position: fixed; bottom: 20px; right: 20px; display: flex; align-items: flex-end; gap: 12px; z-index: 100; max-width: 380px; pointer-events: none; }
+    .bot-bubble { background: var(--bg-card); border: 2px solid var(--primary-red); padding: 14px 16px; border-radius: 16px 16px 4px 16px; box-shadow: var(--shadow-lg); pointer-events: auto; display: block; position: relative; width: 100%; }
+    .bot-bubble p { margin-bottom: 6px; font-size: 13px; color: var(--text-main); }
+    .bot-bubble p:last-child { margin-bottom: 0; }
+    .bot-header-tag { font-size: 11px; font-weight: 800; color: var(--primary-red); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+    .bot-status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block; }
+    .bot-toggle-btn { background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+    .bot-toggle-btn:hover { background: var(--bg-base); color: var(--primary-red); }
+    
+    .bot-avatar { width: 54px; height: 54px; background: #ffffff; border: 3px solid var(--primary-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: var(--shadow-md); pointer-events: auto; flex-shrink: 0; cursor: pointer; }
+
+    /* FEEDBACK CARDS */
+    .feedback-box { padding: 16px 20px; border-radius: var(--radius-sm); font-size: 14px; line-height: 1.6; margin-top: 16px; display: none; animation: fadeIn 0.3s ease; }
+    .feedback-box.success { background: var(--success-light); border: 1px solid #a7f3d0; color: #065f46; }
+    .feedback-box.error { background: var(--danger-light); border: 1px solid #fecaca; color: #991b1b; }
+
+    /* TOAST ANIMACIÓN LOGRO */
+    .achievement-toast { position: fixed; top: 70px; right: 20px; background: var(--success); color: white; padding: 12px 20px; border-radius: var(--radius-md); font-weight: 800; font-size: 14px; box-shadow: var(--shadow-lg); z-index: 500; display: flex; align-items: center; gap: 10px; animation: slideInPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    /* OVERLAYS Y MODALES CON SOPORTE COMPLETO EN WEBKIT */
+    .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal { background: var(--bg-card); border-radius: var(--radius-lg); width: 100%; max-width: 640px; padding: 32px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .modal-title { font-size: 24px; color: var(--primary-red); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; font-weight: 800; }
+    
+    .checklist { list-style: none; margin-bottom: 24px; }
+    .checklist li { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; color: var(--text-main); }
+
+    .modal-mini { max-width: 420px; }
+    .modal-mini h3 { font-size: 18px; margin-bottom: 12px; color: var(--primary-red); }
+    
+    .hidden { display: none !important; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideInPop { from { transform: translateY(-20px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    
+    /* ADAPTACIÓN MÓVIL CRÍTICA PARA EVITAR BARRERAS DE HIOBOT SOBRE BOTONES */
+    @media (max-width: 768px) {
+      .sidebar { flex-direction: row; width: 100%; height: 60px; padding: 0 16px; border-right: none; border-top: 1px solid var(--border); order: 3; justify-content: space-between; }
+      .main-wrapper { flex-direction: column; }
+      .viewport { padding: 16px; }
+      .content-container { padding-bottom: 250px !important; }
+      .bot-widget { bottom: 70px; right: 12px; left: 12px; max-width: none; }
+      .brand-logo { display: none; }
+      .progress-wrapper { margin: 0 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CONFIGURACIÓN DE MOODLE Y ENLACES -->
+  <script>
+    const CONFIG = {
+      NOMBRE_CURSO: "Fabricaciones HiOffice",
+      ENLACE_CONTINUAR: "#",
+      PUNTAJE_INICIAL: 100,
+      PENALIZACION_ERROR: 15
+    };
+  </script>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">HiOFFICE</div>
+      <div class="progress-wrapper">
+        <div class="progress-text">
+          <span id="ui-step-text">MISIÓN 1 DE 6</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="ui-progress-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="score-badge" id="ui-score">⭐ 100 puntos disponibles</div>
+      <button class="btn-icon" onclick="toggleFullscreen()" title="Pantalla Completa">⛶</button>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    <!-- NAVEGACIÓN LATERAL -->
+    <nav class="sidebar">
+      <div class="nav-icon active" id="nav-art" onclick="handleNav('art')" title="Artículos">📦</div>
+      <div class="nav-icon locked" id="nav-fab" onclick="handleNav('fab')" title="Fabricaciones">⚙️</div>
+      <div class="nav-icon locked" id="nav-pos" onclick="handleNav('pos')" title="Ventas HioPOS">🛒</div>
+      <div class="nav-icon locked" id="nav-prev" onclick="handleNav('prev')" title="Previsión de Stock">📊</div>
+    </nav>
+
+    <!-- VIEWPORT PRINCIPAL -->
+    <main class="viewport" id="viewport">
+      <div class="content-container" id="content-area"></div>
+    </main>
+  </div>
+
+  <!-- HIOBOT ASISTENTE PERSONALIZADO -->
+  <div class="bot-widget">
+    <div class="bot-bubble" id="bot-bubble">
+      <div class="bot-header-tag">
+        <span><span class="bot-status-dot"></span> HioBOT Guía</span>
+        <button class="bot-toggle-btn" onclick="toggleBotBubble()">[ Minimizar ]</button>
+      </div>
+      <p id="bot-message"></p>
+    </div>
+    <div class="bot-avatar" onclick="toggleBotBubble()" title="Abrir HioBOT">🤖</div>
+  </div>
+
+  <!-- MODALES -->
+  <!-- Intro Modal -->
+  <div class="overlay" id="modal-intro">
+    <div class="modal">
+      <h2 class="modal-title">🎯 Misión: Fabricaciones HiOffice</h2>
+      <p>La cocina necesita preparar <span class="text-hl">500 g de Salsa de la Casa</span>. Para lograrlo deberás configurar correctamente el artículo, definir sus unidades, crear y ejecutar una fabricación y posteriormente gestionar una necesidad de producción.</p>
+      
+      <h4 style="margin-top: 20px;">Durante esta misión aprenderás a:</h4>
+      <ul class="checklist">
+        <li>✅ Configurar una subreceta en la ficha técnica.</li>
+        <li>✅ Definir sus unidades de medida.</li>
+        <li>✅ Crear una fabricación manual.</li>
+        <li>✅ Ejecutar y finalizar una fabricación.</li>
+        <li>✅ Gestionar una necesidad desde HioPOS.</li>
+        <li>✅ Utilizar la previsión de stock automática.</li>
+      </ul>
+
+      <div class="btn-container" style="justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="startMission()">COMENZAR MISIÓN →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div class="overlay hidden" id="modal-confirm">
+    <div class="modal modal-mini">
+      <h3 id="confirm-title">Confirmar</h3>
+      <p id="confirm-msg">¿Estás seguro?</p>
+      <div class="btn-container" style="justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeModal('modal-confirm')">Cancelar</button>
+        <button class="btn btn-primary" id="confirm-btn-action">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cierre -->
+  <div class="overlay hidden" id="modal-outro">
+    <div class="modal">
+      <h2 class="modal-title" style="justify-content: center; font-size: 28px;">🎉 ¡Misión completada!</h2>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <div style="font-size: 48px; font-weight: 800; color: var(--primary-red);" id="outro-score">100 / 100</div>
+        <p style="font-weight: 700; color: var(--text-muted);">Puntaje Obtenido</p>
+      </div>
+
+      <div style="background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); margin-bottom: 24px;">
+        <h4 style="color: var(--primary-red);">Has completado:</h4>
+        <ul class="checklist" style="margin-bottom: 0;">
+          <li>✅ Configuración del artículo</li>
+          <li>✅ Unidades de medida (Gramos)</li>
+          <li>✅ Creación de fabricación y escandallo</li>
+          <li>✅ Ejecución de fabricación (+500 g)</li>
+          <li>✅ Gestión de necesidad desde HioPOS</li>
+          <li>✅ Previsión de stock (20 - (-1) = 21)</li>
+        </ul>
+      </div>
+
+      <div id="outro-feedback" style="background: var(--warning-light); padding: 16px; border-radius: var(--radius-sm); border: 1px solid #fde68a; display: none; margin-bottom: 24px; color: #92400e; font-size: 14px;">
+        <strong>Conceptos por reforzar:</strong>
+        <ul id="outro-errors-list" style="margin-top: 8px; padding-left: 20px;"></ul>
+      </div>
+
+      <div class="btn-container" style="justify-content: space-between;">
+        <button class="btn btn-secondary" onclick="location.reload()">🔄 Intentar nuevamente</button>
+        <a href="#" id="btn-continue-course" class="btn btn-primary" style="text-decoration: none;">CONTINUAR →</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ESTADO DEL SIMULADOR
+    let state = {
+      mode: 'practice',
+      step: 1,
+      score: CONFIG.PUNTAJE_INICIAL,
+      errorsSet: new Set(),
+      module: 'art',
+      fabStock: 0,
+      fabStatus: 'Borrador',
+      botMinimized: false
+    };
+
+    // DATOS DE CADA MISIÓN
+    const stepsData = {
+      1: {
+        module: 'art',
+        botInit: "La cocina necesita preparar <span class='text-hl'>Salsa de la Casa</span> y debemos configurar correctamente el artículo. Analiza la situación y decide cómo configurarlo.",
+        hint: "Piensa en una preparación que se realiza internamente y cuyo inventario debe controlarse físicamente."
+      },
+      2: {
+        module: 'art',
+        botInit: "La <span class='text-hl'>Salsa de la Casa</span> se prepara e inventaría por <span class='text-hl'>gramos (g)</span>. Selecciona las unidades correspondientes.",
+        hint: "Asegúrate de mantener consistencia: selecciona 'Gramos (g)' tanto para la receta como para el almacenamiento en bodega."
+      },
+      3: {
+        module: 'fab',
+        botInit: "Se requiere fabricar <span class='text-hl'>500 g de Salsa de la Casa</span> en la <span class='text-hl'>W7- PaolaMV – Cocina Principal</span>. Interpreta la nota de solicitud e ingresa los datos.",
+        hint: "Verifica el almacén correspondiente a la cocina principal y escribe exactamente 500 en cantidad."
+      },
+      4: {
+        module: 'fab',
+        botInit: "La orden está en <span class='text-hl'>Borrador</span>. Inicia el proceso en cocina y luego finalízalo para ver el impacto en el inventario.",
+        hint: "Primero presiona 'Iniciar fabricación'. Una vez en proceso, podrás presionar 'Finalizar fabricación'."
+      },
+      5: {
+        module: 'pos',
+        botInit: "Llegó una reserva por <span class='text-hl'>1 unidad de Salsa de la Casa</span> desde HioPOS pero no hay stock suficiente. ¿Qué acción corresponde?",
+        hint: "Servir o Facturar directo sin inventario generará un saldo negativo en bodega. Revisa la opción que solicita producción."
+      },
+      6: {
+        module: 'prev',
+        botInit: "Analiza la matriz de Previsión de Stocks automática de HiOffice. Determina el valor que debe calcular el sistema y su justificación.",
+        hint: "Aplica la fórmula: A Fabricar = Stock Máximo - Stock Futuro. Es decir: 20 - (-1)..."
+      }
+    };
+
+    // CONTROL DE UI
+    function updateProgress() {
+      const p = Math.round(((state.step - 1) / 6) * 100);
+      document.getElementById('ui-step-text').innerText = `MISIÓN ${Math.min(state.step, 6)} DE 6`;
+      document.getElementById('ui-progress-bar').style.width = `${p}%`;
+    }
+
+    function updateScoreDisplay() {
+      if (state.score < CONFIG.PUNTAJE_INICIAL) {
+        document.getElementById('ui-score').innerText = `⭐ Puntaje obtenido: ${state.score} / 100`;
+      }
+    }
+
+    function triggerAchievementToast(stepNum) {
+      const toast = document.createElement('div');
+      toast.className = 'achievement-toast';
+      toast.innerHTML = `<span>🎉</span> ¡Misión ${stepNum} completada!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    function unlockSidebar(mod) {
+      document.getElementById(`nav-${mod}`).classList.remove('locked');
+    }
+
+    function setSidebar(mod) {
+      document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
+      document.getElementById(`nav-${mod}`).classList.add('active');
+    }
+
+    function handleNav(mod) {
+      const isLocked = document.getElementById(`nav-${mod}`).classList.contains('locked');
+      if (isLocked) {
+        showBot("🔒 <b>Módulo bloqueado.</b> Completa primero la actividad actual para continuar.");
+      } else {
+        setSidebar(mod);
+        renderView();
+      }
+    }
+
+    // MANEJO DE PANTALLA COMPLETA SEGURO PARA iOS
+    function toggleFullscreen() {
+      const doc = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (doc.requestFullscreen) {
+          doc.requestFullscreen().catch(() => {});
+        } else if (doc.webkitRequestFullscreen) {
+          doc.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    // HIOBOT ASSISTANT
+    function showBot(msg) {
+      const bubble = document.getElementById('bot-bubble');
+      document.getElementById('bot-message').innerHTML = msg;
+      if (!state.botMinimized) {
+        bubble.style.display = 'block';
+      }
+    }
+
+    function toggleBotBubble() {
+      const bubble = document.getElementById('bot-bubble');
+      state.botMinimized = !state.botMinimized;
+      bubble.style.display = state.botMinimized ? 'none' : 'block';
+    }
+
+    function showHint() {
+      if (state.botMinimized) toggleBotBubble();
+      showBot(`💡 <b>Pista:</b> ${stepsData[state.step].hint}`);
+    }
+
+    function handleWrong(msg, explanation) {
+      if (!state.errorsSet.has(state.step)) {
+        state.errorsSet.add(state.step);
+        if (state.mode === 'eval') {
+          state.score = Math.max(0, state.score - CONFIG.PENALIZACION_ERROR);
+          updateScoreDisplay();
+        }
+      }
+      
+      const html = `❌ <b>Casi.</b> ${msg}<br><span style="font-size:13px; color:var(--text-main)">${explanation}</span>`;
+      displayFeedbackBox('error', html);
+      showBot(`Casi. Revisa la información disponible y analiza la situación nuevamente.`);
+    }
+
+    function displayFeedbackBox(type, contentHTML) {
+      let b = document.getElementById('feedback-box-area');
+      if (!b) {
+        b = document.createElement('div');
+        b.id = 'feedback-box-area';
+        document.getElementById('content-area').appendChild(b);
+      }
+      b.className = `feedback-box ${type}`;
+      b.style.display = 'block';
+      b.innerHTML = contentHTML;
+    }
+
+    // MODALES CON CIERRE DIRECTO WEBKIT/SAFARI
+    function openModal(id) { 
+      const m = document.getElementById(id);
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+    
+    function closeModal(id) { 
+      const m = document.getElementById(id);
+      m.classList.add('hidden');
+      m.style.display = 'none';
+    }
+    
+    function confirmAction(title, msg, onConfirm) {
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-msg').innerText = msg;
+      const btn = document.getElementById('confirm-btn-action');
+      btn.onclick = () => {
+        closeModal('modal-confirm');
+        onConfirm();
+      };
+      openModal('modal-confirm');
+    }
+
+    // FLUJO
+    function startMission() {
+      closeModal('modal-intro');
+      goToStep(1);
+    }
+
+    function goToStep(s) {
+      if (s > state.step && s <= 7) {
+        triggerAchievementToast(state.step);
+      }
+      
+      state.step = s;
+      
+      if (s === 3 || s === 4) { unlockSidebar('fab'); state.module = 'fab'; }
+      if (s === 5) { unlockSidebar('pos'); state.module = 'pos'; }
+      if (s === 6) { unlockSidebar('prev'); state.module = 'prev'; }
+
+      updateProgress();
+      setSidebar(state.module);
+      
+      if (s <= 6) {
+        renderView();
+        setTimeout(() => showBot(stepsData[s].botInit), 300);
+      } else {
+        finishMission();
+      }
+    }
+
+    function renderView() {
+      const container = document.getElementById('content-area');
+      container.innerHTML = '';
+
+      if (state.step === 1) renderStep1(container);
+      else if (state.step === 2) renderStep2(container);
+      else if (state.step === 3) renderStep3(container);
+      else if (state.step === 4) renderStep4(container);
+      else if (state.step === 5) renderStep5(container);
+      else if (state.step === 6) renderStep6(container);
+    }
+
+    // ==========================================
+    // RENDERS DE CADA MISIÓN
+    // ==========================================
+
+    /* MISIÓN 1 */
+    function renderStep1(c) {
+      c.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-icon">📝</div>
+          <div class="situation-content">
+            <h4>🔴 Misión 1</h4>
+            <p>La cocina necesita preparar <span class="text-hl">Salsa de la Casa</span> y debemos configurar correctamente el artículo en HiOffice.</p>
+          </div>
+        </div>
+
+        <div class="hioffice-mock-header">
+          <div class="mock-tab">General</div>
+          <div class="mock-tab active">Propiedades</div>
+          <div class="mock-tab">Formatos</div>
+          <div class="mock-tab">Precios</div>
+        </div>
+
+        <div class="card with-tabs">
+          <div class="card-header">
+            <span>Ficha de Artículo: Salsa de la Casa</span>
+            <span class="status-badge status-draft">Ref: ART-0042</span>
+          </div>
+          
+          <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Selecciona las opciones necesarias para esta preparación interna:</p>
+
+          <div class="grid-options">
+            <label class="option-btn"><input type="checkbox" id="c1"> Es Escandallo</label>
+            <label class="option-btn"><input type="checkbox" id="c2"> Usa Stock</label>
+            <label class="option-btn"><input type="checkbox" id="c3"> Es Venta Directa</label>
+            <label class="option-btn"><input type="checkbox" id="c4"> Se Compra a Proveedor</label>
+            <label class="option-btn"><input type="checkbox" id="c5"> Es Modificador / Comentario</label>
+            <label class="option-btn"><input type="checkbox" id="c6"> Permite Descuento</label>
+          </div>
+
+          <div id="feedback-box-area" class="feedback-box"></div>
+
+          <div class="btn-container">
+            <button class="btn btn-primary" id="btn-action-step1" onclick="valStep1()">Guardar propiedades →</button>
+            <button class="btn btn-hint" onclick="showHint()">💡 PISTA</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function valStep1() {
+      const v = [1,2,3,4,5,6].map(i => document.getElementById('c'+i).checked);
+      if (v[0] && v[1] && !v[2] && !v[3] && !v[4] && !v[5]) {
+        displayFeedbackBox('success', "✅ <b>Configuración correcta.</b> Es Escandallo permite definir la preparación interna y Usa Stock permite controlar su existencia física en inventario.");
+        showBot("¡Excelente! 🎉 La configuración es correcta. Ahora vamos a definir las unidades.");
+        
+        document.getElementById('btn-action-step1').innerText = "Continuar a la Misión 2 ➔";
+        document.getElementById('btn-action-step1').onclick = () => goToStep(2);
+      } else {
+        handleWrong("Revisa la selección de propiedades.", "Esta preparación no se compra a proveedores ni es venta directa. Debes activar únicamente las opciones para preparación interna e inventario.");
+      }
+    }
+
+    /* MISIÓN 2 */
+    function renderStep2(c) {
+      c.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-icon">⚖️</div>
+          <div class="situation-content">
+            <h4>🔴 Misión 2</h4>
+            <p>La <span class="text-hl">Salsa de la Casa</span> se prepara e inventaría por <span class="text-hl">gramos (g)</span>. Selecciona las Unidades de Medida correspondientes.</p>
+          </div>
+        </div>
+
+        <div class="hioffice-mock-header">
+          <div class="mock-tab">General</div>
+          <div class="mock-tab">Propiedades</div>
+          <div class="mock-tab active">Formatos</div>
+          <div class="mock-tab">Precios</div>
+        </div>
+
+        <div class="card with-tabs">
+          <div class="card-header"><span>Ficha de Artículo: Salsa de la Casa</span></div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Unidad Base (Consumo receta):</label>
+              <select id="s-base" class="form-control">
+                <option value="">-- Seleccionar --</option>
+                <option value="ml">Mililitro (ml)</option>
+                <option value="g">Gramos (g)</option>
+                <option value="ud">Unidad (ud)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidad de Bodega (Stock):</label>
+              <select id="s-bod" class="form-control">
+                <option value="">-- Seleccionar --</option>
+                <option value="kg">Kilos (kg)</option>
+                <option value="g">Gramos (g)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="feedback-box-area" class="feedback-box"></div>
+
+          <div class="btn-container">
+            <button class="btn btn-primary" id="btn-action-step2" onclick="valStep2()">Guardar unidades →</button>
+            <button class="btn btn-hint" onclick="showHint()">💡 PISTA</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function valStep2() {
+      if (document.getElementById('s-base').value === 'g' && document.getElementById('s-bod').value === 'g') {
+        displayFeedbackBox('success', "✅ <b>Unidades configuradas correctamente.</b> La <i>Unidad Base</i> define el consumo en receta y la <i>Unidad de Bodega</i> define el saldo en inventario. Al ser ambas Gramos (g), se mantiene consistencia exacta.");
+        showBot("¡Excelente! 🎉 Las unidades están bien configuradas. Ahora vamos a crear la orden de fabricación.");
+        
+        document.getElementById('btn-action-step2').innerText = "Continuar a la Misión 3 ➔";
+        document.getElementById('btn-action-step2').onclick = () => goToStep(3);
+      } else {
+        handleWrong("Unidades incorrectas.", "El requerimiento indica que tanto la preparación (base) como el inventario (bodega) deben ser gramos (g).");
+      }
+    }
+
+    /* MISIÓN 3 */
+    function renderStep3(c) {
+      c.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-icon">🍳</div>
+          <div class="situation-content">
+            <h4>🔴 Misión 3</h4>
+            <p>Interpreta la siguiente nota de producción enviada por cocina e ingresa los datos en el formulario de HiOffice.</p>
+          </div>
+        </div>
+
+        <div style="background:#fffbeb; border:2px dashed #f59e0b; padding:16px; border-radius:var(--radius-sm); margin-bottom:20px; font-size:13px; color:#78350f;">
+          <strong>📄 NOTA DE REQUERIMIENTO #OF-102:</strong><br>
+          "Atención Cocina: Proceder con la preparación de <span class="text-hl">500 g de Salsa de la Casa</span> asignados al almacén de destino <span class="text-hl">W7- PaolaMV – Cocina Principal</span>."
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>Gestión de Fabricación > Nueva Orden Manual</span>
+            <span class="status-badge status-draft">Orden #102</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Almacén Destino:</label>
+              <select id="f-alm" class="form-control">
+                <option value="">-- Seleccionar Almacén --</option>
+                <option value="bod">Bodega Central</option>
+                <option value="coc">W7- PaolaMV – Cocina Principal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Artículo Principal:</label>
+              <select id="f-art" class="form-control">
+                <option value="">-- Seleccionar Artículo --</option>
+                <option value="tom">Pasta de Tomate</option>
+                <option value="sal">Salsa de la Casa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cantidad a Fabricar (g):</label>
+              <input type="number" id="f-can" class="form-control" placeholder="Ej. 500">
+            </div>
+          </div>
+          
+          <div id="esc-view" class="hidden" style="margin-top:24px;">
+            <h5 class="title-red" style="margin-bottom:12px;">📊 Escandallo Desglosado – Salsa de la Casa (500 g)</h5>
+            <div class="data-list">
+              <div class="data-item data-header"><span>Ingrediente Componente</span><span>Cantidad Requerida</span></div>
+              <div class="data-item"><span>Tomate fresco procesado</span><span>300 g</span></div>
+              <div class="data-item"><span>Aceite de Oliva virgen</span><span>100 g</span></div>
+              <div class="data-item"><span>Especias y sal fina</span><span>100 g</span></div>
+              <div class="data-item" style="font-weight:bold; background:var(--bg-base);"><span>Total Producido</span><span>500 g</span></div>
+            </div>
+          </div>
+
+          <div id="feedback-box-area" class="feedback-box"></div>
+
+          <div class="btn-container">
+            <button class="btn btn-primary" id="btn-carg-esc" onclick="valStep3()">Cargar escandallo</button>
+            <button class="btn btn-success hidden" id="btn-conf-fab" onclick="confirmFab()">Crear orden de fabricación →</button>
+            <button class="btn btn-hint" id="btn-pista3" onclick="showHint()">💡 PISTA</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function valStep3() {
+      if (document.getElementById('f-alm').value === 'coc' && document.getElementById('f-art').value === 'sal' && document.getElementById('f-can').value == '500') {
+        document.getElementById('esc-view').classList.remove('hidden');
+        document.getElementById('btn-carg-esc').classList.add('hidden');
+        document.getElementById('btn-pista3').classList.add('hidden');
+        document.getElementById('btn-conf-fab').classList.remove('hidden');
+        displayFeedbackBox('success', "✅ <b>Escandallo cargado correctamente.</b> Se han desglosado los ingredientes para 500 g de Salsa de la Casa.");
+        showBot("¡Muy bien! Se cargó el desglose de escandallo. Confirma la creación de la orden.");
+      } else {
+        handleWrong("Revisa los datos ingresados.", "Asegúrate de seleccionar el almacén Cocina Principal, el artículo Salsa de la Casa y escribir 500.");
+      }
+    }
+
+    function confirmFab() {
+      confirmAction("¿Confirmar orden de fabricación?", "¿Deseas crear la orden de fabricación manual por 500 g de Salsa de la Casa?", () => {
+        goToStep(4);
+      });
+    }
+
+    /* MISIÓN 4 */
+    function renderStep4(c) {
+      const isDraft = state.fabStatus === 'Borrador';
+      const isProc = state.fabStatus === 'En Proceso';
+      const isDone = state.fabStatus === 'Finalizada';
+
+      c.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-icon">🔄</div>
+          <div class="situation-content">
+            <h4>🔴 Misión 4</h4>
+            <p>La orden está en <span class="text-hl">Borrador</span>. Inicia el proceso en cocina y luego finalízalo para acreditar las existencias.</p>
+          </div>
+        </div>
+
+        <div class="stock-panel">
+          <div class="stock-flow">
+            Stock antes: <span class="stock-box">0 g</span>
+            ➔ Fabricación: <span class="stock-box highlight">+500 g</span>
+            ➔ Stock después: <span class="stock-box ${state.fabStock > 0 ? 'highlight' : ''}">${state.fabStock} g</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>Orden #102 – Salsa de la Casa</span>
+            <span class="status-badge ${isDraft ? 'status-draft' : isProc ? 'status-process' : 'status-done'}">
+              ${isDraft ? '🔴 Borrador' : isProc ? '🟡 En proceso' : '🟢 Finalizada'}
+            </span>
+          </div>
+
+          <div id="feedback-box-area" class="feedback-box" style="${isDone ? 'display:block;' : ''}">
+            ${isDone ? '✅ <b>¡Fabricación Finalizada!</b> El inventario en cocina cambió de 0 g → 500 g.' : ''}
+          </div>
+          
+          <div class="btn-container">
+            ${isDone 
+              ? `<button class="btn btn-success" onclick="goToStep(5)">Continuar a la Misión 5 ➔</button>`
+              : `
+                <button class="btn btn-primary" ${!isDraft ? 'disabled' : ''} onclick="changeFabStatus('En Proceso')">▶ Iniciar fabricación</button>
+                <button class="btn btn-success" ${!isProc ? 'disabled' : ''} onclick="changeFabStatus('Finalizada')">✔ Finalizar fabricación</button>
+              `
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function changeFabStatus(newStatus) {
+      if (newStatus === 'En Proceso') {
+        state.fabStatus = newStatus;
+        renderView();
+        showBot("La orden cambió a En proceso. Ahora presiona Finalizar fabricación cuando la cocina termine.");
+      } else if (newStatus === 'Finalizada') {
+        state.fabStatus = newStatus;
+        state.fabStock = 500;
+        renderView();
+        showBot("¡Excelente! 🎉 Finalizamos la orden y acreditamos los 500 g en inventario.");
+      }
+    }
+
+    /* MISIÓN 5 */
+    function renderStep5(c) {
+      c.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-icon">🛎️</div>
+          <div class="situation-content">
+            <h4>🔴 Misión 5</h4>
+            <p>Ha llegado una reserva desde HioPOS por <span class="text-hl">1 unidad (porción) de Salsa de la Casa</span>. Actualmente NO existe stock suficiente en cocina para atenderla. ¿Qué acción corresponde en la cabecera?</p>
+          </div>
+        </div>
+
+        <div class="hipos-screen-container">
+          <div class="hipos-header-bar">
+            <span>🛒 HiPOS - PUNTO DE VENTA | COMANDA #PV00701</span>
+            <span>Mesa 04 | Mesero: Alexander R.</span>
+          </div>
+
+          <div style="background:#1e293b; padding:12px; border-radius:var(--radius-sm); margin-bottom:14px; font-size:13px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span>• 1x Salsa de la Casa (Porción / 500g)</span>
+              <span style="color:#f59e0b; font-weight:700;">RESERVADO</span>
+            </div>
+            <div style="font-size:11px; color:#94a3b8;">Almacén Cocina: <span style="color:#ef4444; font-weight:700;">0 g Disponibles</span></div>
+          </div>
+
+          <div style="font-size:12px; color:#cbd5e1; margin-bottom:10px;">Selecciona la acción de cabecera en el TP POS:</div>
+
+          <div class="grid-options" style="grid-template-columns:1fr; max-width:340px;">
+            <button class="option-btn" style="background:#1e293b; color:white; border-color:#475569;" onclick="valStep5('servir')">Servir</button>
+            <button class="option-btn" id="opt-pedir-pos" style="background:var(--primary-red); color:white; border-color:var(--primary-red);" onclick="valStep5('pedir')">Pedir fabricación</button>
+            <button class="option-btn" style="background:#1e293b; color:white; border-color:#475569;" onclick="valStep5('facturar')">Facturar directo</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div id="feedback-box-area" class="feedback-box"></div>
+          
+          <div class="btn-container">
+            <button class="btn btn-hint" onclick="showHint()">💡 PISTA</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function valStep5(action) {
+      if (action === 'pedir') {
+        displayFeedbackBox('success', "✅ <b>¡Muy bien! Tu decisión es correcta.</b> Como no existe disponibilidad suficiente, se debe solicitar la fabricación para enviar la solicitud a cocina sin descontar inventario en cero.");
+        showBot("¡Muy bien! 🎉 Tu decisión es correcta. Ahora podemos continuar.");
+        
+        const btn = document.getElementById('opt-pedir-pos');
+        btn.innerText = "Continuar a la Misión 6 ➔";
+        btn.style.background = "var(--success)";
+        btn.style.borderColor = "var(--success)";
+        btn.onclick = () => goToStep(6);
+      } else {
+        handleWrong("Acción incorrecta.", "Servir o facturar directo un producto sin stock generará un descuadre negativo. Revisa qué acción permite solicitar la producción necesaria.");
+      }
+    }
+
+    /* MISIÓN 6 */
+    function renderStep6(c) {
+      c.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-icon">📈</div>
+          <div class="situation-content">
+            <h4>🔴 Misión 6</h4>
+            <p>Analicemos la matriz de Previsión de Stocks automática de HiOffice.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span>Compras y Stock > Previsión de Stocks</span></div>
+          
+          <div class="data-list table-responsive-mobile" style="margin-bottom:24px;">
+            <div class="data-item data-header">
+              <span>Stock Real</span><span>Stock Futuro</span><span>Mínimo</span><span>Máximo</span><span>A Fabricar</span>
+            </div>
+            <div class="data-item">
+              <span class="data-cell-mobile" data-label="Stock Real">0</span>
+              <span class="data-cell-mobile" data-label="Stock Futuro" style="color:var(--danger); font-weight:700;">-1</span>
+              <span class="data-cell-mobile" data-label="Mínimo">10</span>
+              <span class="data-cell-mobile" data-label="Máximo">20</span>
+              <span class="data-cell-mobile text-hl" data-label="A Fabricar">?</span>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:20px;">
+            <label class="form-label">Pregunta 1: ¿Cuánto debe fabricar el sistema?</label>
+            <div class="grid-options" style="grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));">
+              <label class="option-btn" onclick="onRadioChange(this, 'calc')"><input type="radio" name="calc" value="19" class="hidden">19 unidades</label>
+              <label class="option-btn" onclick="onRadioChange(this, 'calc')"><input type="radio" name="calc" value="20" class="hidden">20 unidades</label>
+              <label class="option-btn" onclick="onRadioChange(this, 'calc')"><input type="radio" name="calc" value="21" class="hidden">21 unidades</label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:24px;">
+            <label class="form-label">Pregunta 2: ¿Por qué?</label>
+            <div class="grid-options" style="grid-template-columns: 1fr;">
+              <label class="option-btn" onclick="onRadioChange(this, 'why')"><input type="radio" name="why" value="A" class="hidden">A) Porque la previsión busca llevar el stock futuro al máximo (cubriendo la reserva pendiente).</label>
+              <label class="option-btn" onclick="onRadioChange(this, 'why')"><input type="radio" name="why" value="B" class="hidden">B) Porque siempre se fabrica únicamente hasta el mínimo operativo.</label>
+            </div>
+          </div>
+
+          <div id="feedback-box-area" class="feedback-box"></div>
+
+          <div class="btn-container">
+            <button class="btn btn-primary" onclick="valStep6()">Generar fabricación automática →</button>
+            <button class="btn btn-hint" onclick="showHint()">💡 PISTA</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function onRadioChange(labelEl, groupName) {
+      document.querySelectorAll(`input[name="${groupName}"]`).forEach(input => {
+        input.checked = false;
+        input.closest('.option-btn').classList.remove('selected');
+      });
+      const radio = labelEl.querySelector('input[type="radio"]');
+      if (radio) {
+        radio.checked = true;
+        labelEl.classList.add('selected');
+      }
+    }
+
+    function valStep6() {
+      const calcVal = document.querySelector('input[name="calc"]:checked')?.value;
+      const whyVal = document.querySelector('input[name="why"]:checked')?.value;
+
+      if (calcVal === '21' && whyVal === 'A') {
+        confirmAction(
+          "Generar fabricación automática",
+          "La cantidad calculada es de 21 unidades. ¿Deseas generar la orden de fabricación?",
+          () => {
+            goToStep(7);
+          }
+        );
+      } else {
+        handleWrong(
+          "Cálculo o fundamentación incorrectos.",
+          "Fórmula: A Fabricar = Máximo - Futuro. Es decir: 20 - (-1) = 21. El sistema cubre el pedido pendiente y repone el almacén al máximo deseado."
+        );
+      }
+    }
+
+    // PANTALLA FINAL DE CIERRE
+    function finishMission() {
+      document.getElementById('ui-step-text').innerText = 'MISIÓN COMPLETADA';
+      document.getElementById('ui-progress-bar').style.width = '100%';
+
+      document.getElementById('outro-score').innerText = `⭐ Puntaje obtenido: ${state.score} / 100`;
+      
+      const errorList = document.getElementById('outro-errors-list');
+      errorList.innerHTML = '';
+      if (state.errorsSet.size > 0) {
+        document.getElementById('outro-feedback').style.display = 'block';
+        if(state.errorsSet.has(1)) errorList.innerHTML += `<li>Propiedades de ficha técnica (Escandallo y Stock).</li>`;
+        if(state.errorsSet.has(2)) errorList.innerHTML += `<li>Consistencia de unidades de masa (Gramos).</li>`;
+        if(state.errorsSet.has(3)) errorList.innerHTML += `<li>Parámetros de creación de orden manual.</li>`;
+        if(state.errorsSet.has(5)) errorList.innerHTML += `<li>Gestión de necesidad desde HioPOS.</li>`;
+        if(state.errorsSet.has(6)) errorList.innerHTML += `<li>Fórmula de Previsión de Stock: 20 - (-1) = 21.</li>`;
+      }
+
+      document.getElementById('btn-continue-course').href = CONFIG.ENLACE_CONTINUAR;
+      openModal('modal-outro');
+    }
+  </script>
+</body>
+</html>
